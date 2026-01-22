@@ -7,11 +7,14 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/shipit-ai-demo-org/shipping-rates-service/internal/carriers"
 	"github.com/shipit-ai-demo-org/shipping-rates-service/internal/quote"
 )
 
 func main() {
-	eng := quote.NewEngine()
+	eng := quote.NewEngine(
+		carriers.NewUPS(),
+	)
 
 	mux := http.NewServeMux()
 
