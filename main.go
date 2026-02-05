@@ -14,6 +14,7 @@ import (
 func main() {
 	eng := quote.NewEngine(
 		carriers.NewUPS(),
+		carriers.NewFedEx(),
 	)
 
 	mux := http.NewServeMux()
