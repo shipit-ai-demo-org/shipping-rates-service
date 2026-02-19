@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/shipit-ai-demo-org/shipping-rates-service/internal/carriers"
 	"github.com/shipit-ai-demo-org/shipping-rates-service/internal/quote"
@@ -13,6 +14,7 @@ import (
 
 func main() {
 	eng := quote.NewEngine(
+		quote.NewCache(5*time.Minute),
 		carriers.NewUPS(),
 		carriers.NewFedEx(),
 	)

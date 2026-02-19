@@ -47,16 +47,23 @@ func BillableWeightKg(s Shipment) float64 {
 
 type Engine struct {
 	carriers []Carrier
+	cache    *Cache
 }
 
-func NewEngine(carriers ...Carrier) *Engine {
-	return &Engine{carriers: carriers}
+func NewEngine(cache *Cache, carriers ...Carrier) *Engine {
+	return &Engine{cache: cache, carriers: carriers}
 }
 
 // BestRate fans out to every registered carrier and returns the cheapest
 // quote plus the full set of alternatives. A carrier failure degrades the
 // comparison rather than failing the request.
 func (e *Engine) BestRate(ctx context.Context, s Shipment) (Rate, []Rate, error) {
+	if e.cache != nil {
+		if best, alts, ok := e.cache.Get(s); ok {
+			return best, alts, nil
+		}
+	}
+
 	var rates []Rate
 	for _, c := range e.carriers {
 		rate, err := c.Quote(ctx, s)
@@ -73,6 +80,10 @@ func (e *Engine) BestRate(ctx context.Context, s Shipment) (Rate, []Rate, error)
 	sort.Slice(rates, func(i, j int) bool {
 		return rates[i].AmountCents < rates[j].AmountCents
 	})
+
+	if e.cache != nil {
+		e.cache.Set(s, rates[0], rates)
+	}
 
 	return rates[0], rates, nil
 }
