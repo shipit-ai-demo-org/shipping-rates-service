@@ -77,8 +77,17 @@ func (e *Engine) BestRate(ctx context.Context, s Shipment) (Rate, []Rate, error)
 		return Rate{}, nil, ErrNoQuotes
 	}
 
+	// Deterministic ordering: carriers frequently tie on price, and map
+	// iteration order was flipping the "best" carrier between identical
+	// requests (SHIP-312). Tie-break on transit time, then carrier name.
 	sort.Slice(rates, func(i, j int) bool {
-		return rates[i].AmountCents < rates[j].AmountCents
+		if rates[i].AmountCents != rates[j].AmountCents {
+			return rates[i].AmountCents < rates[j].AmountCents
+		}
+		if rates[i].TransitDays != rates[j].TransitDays {
+			return rates[i].TransitDays < rates[j].TransitDays
+		}
+		return rates[i].Carrier < rates[j].Carrier
 	})
 
 	if e.cache != nil {
