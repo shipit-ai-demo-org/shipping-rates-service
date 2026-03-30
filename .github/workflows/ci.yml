@@ -1,0 +1,25 @@
+name: CI
+
+on: [push, workflow_dispatch]
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify module definition
+        run: |
+          test -f go.mod
+          grep -q "module github.com/shipit-ai-demo-org/shipping-rates-service" go.mod
+          grep -q "go 1.22" go.mod
+
+      - name: Verify carrier adapters
+        run: |
+          test -f internal/carriers/ups.go
+          test -f internal/carriers/fedex.go
+
+      - name: Verify quote engine contracts
+        run: |
+          grep -q "BillableWeightKg" internal/quote/engine.go
+          grep -q "func NewCache" internal/quote/cache.go
