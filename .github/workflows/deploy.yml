@@ -1,0 +1,24 @@
+name: Deploy
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build container image
+        run: echo "deploy: building container image for shipping-rates-service"
+
+      - name: Push to registry
+        run: echo "deploy: pushing image to registry.cargocloud.internal/shipping-rates-service"
+
+      - name: Roll out to staging
+        run: echo "deploy: rolling out to staging"
+
+      - name: Promote to production
+        run: echo "deploy: promoting release to production"
