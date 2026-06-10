@@ -26,7 +26,13 @@ func NewCache(ttl time.Duration) *Cache {
 }
 
 func cacheKey(s Shipment) string {
-	return fmt.Sprintf("%s|%s|%s|%.2f", s.OriginZip, s.DestZip, s.Service, s.WeightKg)
+	// Two shipments with the same scale weight but different dimensions can
+	// have different billable (dimensional) weights, so dims must be part of
+	// the key — colliding entries were serving stale cheaper quotes for
+	// bulky parcels (SHIP-377).
+	return fmt.Sprintf("%s|%s|%s|%.2f|%.0fx%.0fx%.0f",
+		s.OriginZip, s.DestZip, s.Service, s.WeightKg,
+		s.LengthCm, s.WidthCm, s.HeightCm)
 }
 
 func (c *Cache) Get(s Shipment) (Rate, []Rate, bool) {
