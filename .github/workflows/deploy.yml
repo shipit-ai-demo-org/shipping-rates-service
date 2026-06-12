@@ -12,13 +12,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build container image
-        run: echo "deploy: building container image for shipping-rates-service"
+        run: 'echo "deploy: building container image for shipping-rates-service"'
 
       - name: Push to registry
-        run: echo "deploy: pushing image to registry.cargocloud.internal/shipping-rates-service"
+        run: 'echo "deploy: pushing image to registry.cargocloud.internal/shipping-rates-service"'
 
       - name: Roll out to staging
-        run: echo "deploy: rolling out to staging"
+        run: 'echo "deploy: rolling out to staging"'
 
       - name: Promote to production
-        run: echo "deploy: promoting release to production"
+        run: 'echo "deploy: promoting release to production"'
